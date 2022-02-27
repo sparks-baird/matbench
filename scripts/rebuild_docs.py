@@ -17,9 +17,9 @@ from matbench.bench import MatbenchBenchmark
 from matbench.constants import MBV01_KEY, CLF_KEY, REG_KEY
 from matbench.metadata import mbv01_metadata
 
-pd.set_option('display.max_rows', 500)
-pd.set_option('display.max_columns', 500)
-pd.set_option('display.width', 1000)
+pd.set_option("display.max_rows", 500)
+pd.set_option("display.max_columns", 500)
+pd.set_option("display.width", 1000)
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 DOCS_DIR = os.path.join(THIS_DIR, "../docs_src")
@@ -53,135 +53,152 @@ def generate_scaled_errors_graph(gp_graph_data_by_bmark):
     """
     for bmark_name, tasks_data in gp_graph_data_by_bmark.items():
 
-            if bmark_name == MBV01_KEY:
+        if bmark_name == MBV01_KEY:
 
-                symbols = {
-                    "matbench_steels": "σᵧ",
-                    "matbench_jdft2d": "Eˣ",
-                    "matbench_phonons": "ωᵐᵃˣ",
-                    "matbench_dielectric": "𝑛",
-                    "matbench_expt_gap": "Eᵍ",
-                    "matbench_expt_is_metal": "Expt. Metallicity",
-                    "matbench_glass": "Metallic Glass",
-                    "matbench_log_kvrh": "log₁₀Kᵛʳʰ",
-                    "matbench_log_gvrh": "log₁₀Gᵛʳʰ",
-                    "matbench_perovskites": "Eᶠ",
-                    "matbench_mp_gap": "Eᵍ",
-                    "matbench_mp_is_metal": "Metallicity",
-                    "matbench_mp_e_form": "Eᶠ"
-                }
+            symbols = {
+                "matbench_steels": "σᵧ",
+                "matbench_jdft2d": "Eˣ",
+                "matbench_phonons": "ωᵐᵃˣ",
+                "matbench_dielectric": "𝑛",
+                "matbench_expt_gap": "Eᵍ",
+                "matbench_expt_is_metal": "Expt. Metallicity",
+                "matbench_glass": "Metallic Glass",
+                "matbench_log_kvrh": "log₁₀Kᵛʳʰ",
+                "matbench_log_gvrh": "log₁₀Gᵛʳʰ",
+                "matbench_perovskites": "Eᶠ",
+                "matbench_mp_gap": "Eᵍ",
+                "matbench_mp_is_metal": "Metallicity",
+                "matbench_mp_e_form": "Eᶠ",
+            }
 
-                descriptors = {
-                    "matbench_steels": "Steel alloys",
-                    "matbench_jdft2d": "2D Materials",
-                    "matbench_phonons": "Phonons",
-                    "matbench_dielectric": "",
-                    "matbench_expt_gap": "Experimental",
-                    "matbench_expt_is_metal": "Classification",
-                    "matbench_glass": "Classification",
-                    "matbench_log_gvrh": "",
-                    "matbench_log_kvrh": "",
-                    "matbench_perovskites": "Perovskites, DFT",
-                    "matbench_mp_gap": "DFT",
-                    "matbench_mp_is_metal": "DFT",
-                    "matbench_mp_e_form": "DFT"
-                }
+            descriptors = {
+                "matbench_steels": "Steel alloys",
+                "matbench_jdft2d": "2D Materials",
+                "matbench_phonons": "Phonons",
+                "matbench_dielectric": "",
+                "matbench_expt_gap": "Experimental",
+                "matbench_expt_is_metal": "Classification",
+                "matbench_glass": "Classification",
+                "matbench_log_gvrh": "",
+                "matbench_log_kvrh": "",
+                "matbench_perovskites": "Perovskites, DFT",
+                "matbench_mp_gap": "DFT",
+                "matbench_mp_is_metal": "DFT",
+                "matbench_mp_e_form": "DFT",
+            }
 
-                metadata = mbv01_metadata
+            metadata = mbv01_metadata
 
+        else:
+            raise ValueError(
+                f"Only {MBV01_KEY} defined as valid benchmark! '{bmark_name}' not supported."
+            )
+
+        # should take care of missing entries (i.e., structure only) automatically
+        df = pd.DataFrame(tasks_data)
+
+        # make scaled data for heatmap coloring
+        # scale regression problems by mad/mae
+        def scale_regression_problem(series, mad):
+            mask = series > 0.0
+            mask_iix = np.where(mask)
+            series.iloc[mask_iix] = series.iloc[mask_iix] / mad
+            series.loc[~mask] = np.nan
+            return series
+
+        def scale_classification_problem(series, mad):
+            mask = series > 0.0
+            mask_iix = np.where(mask)
+            series.iloc[mask_iix] = 1 - (series.iloc[mask_iix] - 0.5) / 0.5
+            # series.iloc[mask_iix] = 1 - series.iloc[mask_iix]
+            series.loc[~mask] = np.nan
+            return series
+
+        scaled_df = df.copy(deep=True)
+        for task in scaled_df.columns:
+            if metadata[task].task_type == CLF_KEY:
+                scaler = scale_classification_problem
             else:
-                raise ValueError(
-                    f"Only {MBV01_KEY} defined as valid benchmark! '{bmark_name}' not supported.")
+                scaler = scale_regression_problem
 
-            # should take care of missing entries (i.e., structure only) automatically
-            df = pd.DataFrame(tasks_data)
+            scaled_df[task] = scaler(scaled_df[task], metadata[task].mad)
 
-            # make scaled data for heatmap coloring
-            # scale regression problems by mad/mae
-            def scale_regression_problem(series, mad):
-                mask = series > 0.0
-                mask_iix = np.where(mask)
-                series.iloc[mask_iix] = series.iloc[mask_iix] / mad
-                series.loc[~mask] = np.nan
-                return series
+        scaled_df = scaled_df.T
+        scaled_df["n_samples"] = [
+            metadata[task].num_entries for task in scaled_df.index
+        ]
+        scaled_df["Problem"] = [
+            f"{symbols[task]} {descriptors[task]}" for task in scaled_df.index
+        ]
+        scaled_df = scaled_df.sort_values(by="n_samples")
+        scaled_df.index = scaled_df["Problem"]
+        scaled_df = scaled_df.drop(columns=["n_samples", "Problem"])
 
-            def scale_classification_problem(series, mad):
-                mask = series > 0.0
-                mask_iix = np.where(mask)
-                series.iloc[mask_iix] = 1 - (series.iloc[mask_iix] - 0.5) / 0.5
-                # series.iloc[mask_iix] = 1 - series.iloc[mask_iix]
-                series.loc[~mask] = np.nan
-                return series
+        non_fictitious_df = scaled_df[
+            scaled_df.columns.drop(list(scaled_df.filter(regex="fictitious")))
+        ]
+        best_values = non_fictitious_df.min(axis=1)
+        best_algos = non_fictitious_df.idxmin(axis=1)
 
-            scaled_df = df.copy(deep=True)
-            for task in scaled_df.columns:
-                if metadata[task].task_type == CLF_KEY:
-                    scaler = scale_classification_problem
-                else:
-                    scaler = scale_regression_problem
+        # get models as categories in a single column
+        plot_df = scaled_df.melt(value_vars=scaled_df.columns, var_name="algorithm", value_name="error", ignore_index=False)
+        # convert tasks ("Problem") from an index to a column
+        plot_df = plot_df.reset_index()
+        fig = px.strip(
+            plot_df,
+            x="Problem",
+            y="error",
+            color="algorithm",
+            log_y=True,
+            stripmode="overlay",
+        )
+        fig.update_traces(
+            marker={"size": 10},
+            hovertemplate="<br>".join(
+                [
+                    # "Algorithm: %{text}",
+                    "Problem: %{x}",
+                    "Scaled Error: %{y}",
+                ]
+            ),
+        )
 
-                scaled_df[task] = scaler(scaled_df[task], metadata[task].mad)
+        fig.update_layout(
+            title_text="Scaled Errors",
+            title_font_size=30,
+            legend_font_size=15,
+            legend_title_font_size=15,
+            legend_title_text="Algorithm",
+            yaxis_title="Scaled MAE (regression) or <br> (1-ROCAUC)/0.5 (classification)",
+            xaxis_title="",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font={"color": "white"},
+        )
 
-            scaled_df = scaled_df.T
-            scaled_df["n_samples"] = [metadata[task].num_entries for task in scaled_df.index]
-            scaled_df["Problem"] = [f"{symbols[task]} {descriptors[task]}" for task in scaled_df.index]
-            scaled_df = scaled_df.sort_values(by="n_samples")
-            scaled_df.index = scaled_df["Problem"]
-            scaled_df = scaled_df.drop(columns=["n_samples", "Problem"])
-
-            best_values = scaled_df.min(axis=1)
-            best_algos = scaled_df.idxmin(axis=1)
-
-            fig = px.scatter(scaled_df, log_y=True)
-            fig.update_traces(
-                marker={'size': 10},
-                hovertemplate="<br>".join(
-                    [
-                        # "Algorithm: %{text}",
-                        "Problem: %{x}",
-                        "Scaled Error: %{y}"
-                    ]
-                )
+        # add scatter for the best algorithms on scaled error
+        fig.add_trace(
+            go.Scatter(
+                mode="markers",
+                x=best_values.index,
+                y=best_values,
+                marker=dict(
+                    color="yellow",
+                    size=10,
+                ),
+                hovertemplate="Algorithm: %{text}<br>Problem: %{x}<br>Scaled Error: %{y}<br>",
+                text=best_algos,
+                visible="legendonly",
+                name="Best algorithms",
             )
+        )
+        fig.update_xaxes(linecolor="grey", gridcolor="grey")
+        fig.update_yaxes(linecolor="grey", gridcolor="grey")
+        fig.write_html(SCALED_ERRORS_PATH)
 
-            fig.update_layout(title_text="Scaled Errors",
-                              title_font_size=30,
-                              legend_font_size=15,
-                              legend_title_font_size=15,
-                              legend_title_text="Algorithm",
-                              yaxis_title="Scaled MAE (regression) or <br> (1-ROCAUC)/0.5 (classification)",
-                              xaxis_title="", paper_bgcolor='rgba(0,0,0,0)',
-                              plot_bgcolor='rgba(0,0,0,0)',
-                              font={"color": "white"})
-
-            # add scatter for the best algorithms on scaled error
-            fig.add_trace(
-                go.Scatter(
-                    mode="markers",
-                    x=best_values.index,
-                    y=best_values,
-                    marker=dict(
-                        color="yellow",
-                        size=10,
-                    ),
-                    hovertemplate= \
-                        'Algorithm: %{text}<br>Problem: %{x}<br>Scaled Error: %{y}<br>',
-                    text=best_algos,
-                    visible="legendonly",
-                    name="Best algorithms"
-                )
-            )
-            fig.update_xaxes(linecolor="grey", gridcolor="grey")
-            fig.update_yaxes(linecolor="grey", gridcolor="grey")
-            fig.write_html(SCALED_ERRORS_PATH)
-
-
-            # Update layout for showing on white background on mp website
-            fig.update_layout(
-                title_text="",
-                font={"color": "black"}
-            )
-            fig.write_json(SCALED_ERRORS_JSON_PATH)
+        # Update layout for showing on white background on mp website
+        fig.update_layout(title_text="", font={"color": "black"})
+        fig.write_json(SCALED_ERRORS_JSON_PATH)
 
 
 # NOTE: MUST BE CALLED AFTER CREATING generate_scaled_errors_graph
@@ -218,25 +235,33 @@ def generate_general_purpose_leaderboard_and_plot(gp_leaderboard_data_by_bmark):
             "completeness": [d["completeness"] for d in gp_data.values()],
             "link": [d["link"] for d in gp_data.values()],
             "score": [d["score"] for d in gp_data.values()],
-            "type": [d["type"] for d in gp_data.values()]
+            "type": [d["type"] for d in gp_data.values()],
         }
 
         df_src = pd.DataFrame(table_data).sort_values(by="n_samples")
         table_header = f"## Leaderboard: General Purpose Algorithms on `{bmark}`\n\n"
         table_explanation = f"Find more information about this benchmark on [the benchmark info page]({METADATA_DIR_PREFIX}{bmark}.md)\n\n"
-        table = "| Task name | Samples | Algorithm | Verified MAE (unit) or ROCAUC | Notes |\n" \
-                "|------------------|---------|-----------|----------------------|-------|\n"
+        table = (
+            "| Task name | Samples | Algorithm | Verified MAE (unit) or ROCAUC | Notes |\n"
+            "|------------------|---------|-----------|----------------------|-------|\n"
+        )
         # create leaderboard table
         for _, row in df_src.iterrows():
 
             task_name = f"{row['task']}"
-            task_name_link = f"[{task_name}]({PER_TASK_DIR_PREFIX}matbench_v0.1_{task_name}.md)"
+            task_name_link = (
+                f"[{task_name}]({PER_TASK_DIR_PREFIX}matbench_v0.1_{task_name}.md)"
+            )
             samples = format_int(row["n_samples"])
             algorithm = f"[{row['algorithm']}]({row['link']}.md)"
 
-            task_metadata = metadata[row['task']]
+            task_metadata = metadata[row["task"]]
 
-            score = f"{format_float(row['score'])} ({task_metadata.unit})" if task_metadata.task_type == REG_KEY else f"{format_float(row['score'])}"
+            score = (
+                f"{format_float(row['score'])} ({task_metadata.unit})"
+                if task_metadata.task_type == REG_KEY
+                else f"{format_float(row['score'])}"
+            )
             score = f"**{score}**"
 
             if row["completeness"] == "structure":
@@ -244,7 +269,9 @@ def generate_general_purpose_leaderboard_and_plot(gp_leaderboard_data_by_bmark):
             elif row["completeness"] == "all":
                 notes = ""
             else:
-                raise ValueError(f"{row['completeness']} is not a valid type of general purpose completeness!")
+                raise ValueError(
+                    f"{row['completeness']} is not a valid type of general purpose completeness!"
+                )
 
             table += f"| {task_name_link} | {samples} | {algorithm} | {score} | {notes} |\n"
         table += "\n\n"
@@ -258,13 +285,15 @@ def generate_general_purpose_leaderboard_and_plot(gp_leaderboard_data_by_bmark):
         scaled_errors_plot_txt = f'\n<iframe src="static/{SCALED_ERRORS_FILENAME}" class="is-fullwidth" height="700px" width="1000px" frameBorder="0"> </iframe>\n\n'
 
         page_header = f"# Leaderboard\n\n"
-        final_txt = page_header + gp_leaderboard_txt + scaled_errors_plot_txt + static_txt
+        final_txt = (
+            page_header + gp_leaderboard_txt + scaled_errors_plot_txt + static_txt
+        )
 
         with open(os.path.join(DOCS_DIR, "index.md"), "w") as f:
             print("Writing leaderboard and plot to index.md...")
             f.write(final_txt)
 
-        with open(os.path.join(STATIC_DOCS_DIR,  "gp_table.json"), "w") as f:
+        with open(os.path.join(STATIC_DOCS_DIR, "gp_table.json"), "w") as f:
             print("Writing static gp_table json to gp_table.json...")
             j = {"txt": gp_leaderboard_txt}
             json.dump(j, f)
@@ -294,7 +323,7 @@ def generate_per_task_leaderboards(task_leaderboard_data_by_bmark):
                     "mean mae": [],
                     "std mae": [],
                     "mean rmse": [],
-                    "max max_error": []
+                    "max max_error": [],
                 }
             elif task_type == CLF_KEY:
                 table_data = {
@@ -303,7 +332,7 @@ def generate_per_task_leaderboards(task_leaderboard_data_by_bmark):
                     "mean rocauc": [],
                     "std rocauc": [],
                     "mean f1": [],
-                    "mean balanced_accuracy": []
+                    "mean balanced_accuracy": [],
                 }
             else:
                 raise ValueError(f"Task type {task_type} not recognized!")
@@ -326,7 +355,9 @@ def generate_per_task_leaderboards(task_leaderboard_data_by_bmark):
                     table_data["mean rocauc"].append(scores.rocauc.mean)
                     table_data["std rocauc"].append(scores.rocauc.std)
                     table_data["mean f1"].append(scores.f1.mean)
-                    table_data["mean balanced_accuracy"].append(scores.balanced_accuracy.mean)
+                    table_data["mean balanced_accuracy"].append(
+                        scores.balanced_accuracy.mean
+                    )
 
             df = pd.DataFrame(table_data)
             df = df.set_index("algorithm")
@@ -340,9 +371,11 @@ def generate_per_task_leaderboards(task_leaderboard_data_by_bmark):
             header = f"# {bmark_name} {task}\n\n"
 
             subheader = f"## Individual Task Leaderboard for `{task}`\n\n"
-            explanation = "_Leaderboard for an individual task. Algorithms shown here may include " \
-                          "both general purpose and specialized algorithms (i.e., algorithms which " \
-                          "are only valid for a subset of tasks in the benchmark._\n\n"
+            explanation = (
+                "_Leaderboard for an individual task. Algorithms shown here may include "
+                "both general purpose and specialized algorithms (i.e., algorithms which "
+                "are only valid for a subset of tasks in the benchmark._\n\n"
+            )
 
             info_header = "### Dataset info\n\n"
 
@@ -350,15 +383,29 @@ def generate_per_task_leaderboards(task_leaderboard_data_by_bmark):
             info_body += f"Number of samples: {mbt.metadata.num_entries}\n\n"
             info_body += f"Task type: {mbt.metadata.task_type}\n\n"
             info_body += f"Input type: {mbt.metadata.input_type}\n\n"
-            info_body += f"##### Dataset columns\n\n" + "".join([f"- {c}: {cd}\n" for c, cd in mbt.metadata.columns.items()]) + "\n\n"
-            info_body += f"##### Dataset reference\n\n `{mbt.metadata.reference}`\n\n"
+            info_body += (
+                f"##### Dataset columns\n\n"
+                + "".join(
+                    [f"- {c}: {cd}\n" for c, cd in mbt.metadata.columns.items()]
+                )
+                + "\n\n"
+            )
+            info_body += (
+                f"##### Dataset reference\n\n `{mbt.metadata.reference}`\n\n"
+            )
 
             metadata_header = "### Metadata\n\n"
             metadata = f"```\n{pprint.pformat(mbt.metadata)}\n```\n\n"
 
             table_header = "### Leaderboard\n\n"
             column_headers = df.columns
-            table = "| " + " | ".join(column_headers) + " |\n" +  "|------" * len(column_headers) + "|\n"
+            table = (
+                "| "
+                + " | ".join(column_headers)
+                + " |\n"
+                + "|------" * len(column_headers)
+                + "|\n"
+            )
             for ix, row in df.iterrows():
                 table += "| "
                 for th in column_headers:
@@ -374,8 +421,11 @@ def generate_per_task_leaderboards(task_leaderboard_data_by_bmark):
 
             table = table.replace("algorithm w/ link", "algorithm")
 
-
-            droppables = ["mean f1", "mean balanced_accuracy"] if task_type == CLF_KEY else ["mean rmse", "max max_error"]
+            droppables = (
+                ["mean f1", "mean balanced_accuracy"]
+                if task_type == CLF_KEY
+                else ["mean rmse", "max max_error"]
+            )
             df = df.drop(columns=["algorithm w/ link"] + droppables)
             error_metric = "std rocauc" if task_type == CLF_KEY else "std mae"
             fig = px.scatter(df, error_y=error_metric, log_y=True)
@@ -384,16 +434,22 @@ def generate_per_task_leaderboards(task_leaderboard_data_by_bmark):
 
             target = mbt.metadata.target
             lower_or_higher = "lower" if task_type == REG_KEY else "higher"
-            title_prefix = "Errors predicting" if task_type == REG_KEY else \
-                "Classification ROCAUC predicting"
+            title_prefix = (
+                "Errors predicting"
+                if task_type == REG_KEY
+                else "Classification ROCAUC predicting"
+            )
             title = f"{title_prefix} '{target}' ({lower_or_higher} is better)"
-            fig.update_layout(title_text=title,
-                              title_font_size=15,
-                              showlegend=False,
-                              yaxis_title=metric,
-                              xaxis_title="", paper_bgcolor='rgba(0,0,0,0)',
-                              plot_bgcolor='rgba(0,0,0,0)',
-                              font={"color": "white"})
+            fig.update_layout(
+                title_text=title,
+                title_font_size=15,
+                showlegend=False,
+                yaxis_title=metric,
+                xaxis_title="",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font={"color": "white"},
+            )
             fig.update_yaxes(linecolor="grey", gridcolor="grey")
             fig.update_xaxes(linecolor="rgba(0,0,0,0)", gridcolor="rgba(0,0,0,0)")
 
@@ -402,16 +458,18 @@ def generate_per_task_leaderboards(task_leaderboard_data_by_bmark):
 
             fig_reference = f'\n<iframe src="../../static/{fig_path}" class="is-fullwidth" height="700px" width="1000px" frameBorder="0"> </iframe>\n\n'
 
-            task_leaderboard_page = header + \
-                                    subheader + \
-                                    explanation + \
-                                    table_header + \
-                                    table + \
-                                    fig_reference + \
-                                    info_header + \
-                                    info_body + \
-                                    metadata_header + \
-                                    metadata
+            task_leaderboard_page = (
+                header
+                + subheader
+                + explanation
+                + table_header
+                + table
+                + fig_reference
+                + info_header
+                + info_body
+                + metadata_header
+                + metadata
+            )
             fname = os.path.join(PER_TASK_DIR, f"{bmark_name}_{task}.md")
             with open(fname, "w") as f:
                 print(f"Creating task leaderboard page {fname}")
@@ -441,7 +499,6 @@ def organize_task_data(all_data):
         else:
             all_data_per_benchmark[bmark_name] = [data_packet]
 
-
     gp_leaderboard_data_by_bmark = {}
     task_leaderboards_data_by_bmark = {}
     gp_graph_data_by_bmark = {}
@@ -452,13 +509,16 @@ def organize_task_data(all_data):
         else:
             raise ValueError(f"No other benchmarks configured ('{bmark_name}')")
 
-        gp_leaderboard = {t: {
-            "score": None,
-            "type": None,
-            "link": None,
-            "algorithm": None,
-            "completeness": None
-        } for t in metadata.keys()}
+        gp_leaderboard = {
+            t: {
+                "score": None,
+                "type": None,
+                "link": None,
+                "algorithm": None,
+                "completeness": None,
+            }
+            for t in metadata.keys()
+        }
 
         task_leaderboards = {t: [] for t in metadata.keys()}
 
@@ -485,11 +545,14 @@ def organize_task_data(all_data):
                 else:
                     raise ValueError
 
-
                 # Include both GP, structure-required, and strcuture/comp regression algos on
                 # GP leaderboard, as there are 9 structure problems or 10 regresison problems
                 # across multiple dataset sizes (composition only or clf only are not included)
-                if mb.is_complete or mb.is_structure_complete or mb.is_regression_complete:
+                if (
+                    mb.is_complete
+                    or mb.is_structure_complete
+                    or mb.is_regression_complete
+                ):
                     current_best_score = gp_leaderboard[task_name]["score"]
 
                     gp_graph_data[task_name][info["algorithm"]] = score
@@ -511,18 +574,24 @@ def organize_task_data(all_data):
 
                 # Add it to the task-specific leaderboard, as all entries will be included
                 # there
-                task_leaderboards[task_name].append({
-                    "scores": task.scores,
-                    "link": prefix + dir_name_short + ".md",
-                    "algorithm": info["algorithm"],
-                    "type": task.metadata.task_type
-                })
+                task_leaderboards[task_name].append(
+                    {
+                        "scores": task.scores,
+                        "link": prefix + dir_name_short + ".md",
+                        "algorithm": info["algorithm"],
+                        "type": task.metadata.task_type,
+                    }
+                )
 
             gp_leaderboard_data_by_bmark[bmark_name] = gp_leaderboard
             task_leaderboards_data_by_bmark[bmark_name] = task_leaderboards
             gp_graph_data_by_bmark[bmark_name] = gp_graph_data
 
-        return gp_leaderboard_data_by_bmark, task_leaderboards_data_by_bmark, gp_graph_data_by_bmark
+        return (
+            gp_leaderboard_data_by_bmark,
+            task_leaderboards_data_by_bmark,
+            gp_graph_data_by_bmark,
+        )
 
 
 def generate_metadata_pages(task_leaderboard_data_by_bmark):
@@ -546,21 +615,32 @@ def generate_metadata_pages(task_leaderboard_data_by_bmark):
             d[task] = {
                 "Task name": f"`{task}`",
                 "Task type": infod.task_type,
-                "Target column (unit)": f"`{infod.target}` " + f"({infod.unit})" if infod.unit else f"`{infod.target}`",
+                "Target column (unit)": f"`{infod.target}` " + f"({infod.unit})"
+                if infod.unit
+                else f"`{infod.target}`",
                 "Input type": infod.input_type,
                 "Samples": infod.num_entries,
-                "MAD (regression) or Fraction True (classification)": format_float(infod.mad if infod.task_type == REG_KEY else infod.frac_true),
+                "MAD (regression) or Fraction True (classification)": format_float(
+                    infod.mad if infod.task_type == REG_KEY else infod.frac_true
+                ),
                 "Links": f"[download](https://ml.materialsproject.org/projects/{task}.json.gz), [interactive](https://ml.materialsproject.org/projects/{task})",
-                "Submissions": f"{len(bmark_data[task])}"
+                "Submissions": f"{len(bmark_data[task])}",
             }
 
         df = pd.DataFrame(d).T.sort_values(by="Samples")
 
         df["Samples"] = [format_int(i) for i in df["Samples"]]
         table_header = f"# Benchmark info for `{bmark_name}`\n\n"
-        table_explanation = f"The `{bmark_name}` benchmark contains {len(metadata)} tasks:\n\n"
-        table = "| " + " | ".join(df.columns) + "|\n" + \
-            "|-------" * len(df.columns) + "|\n"
+        table_explanation = (
+            f"The `{bmark_name}` benchmark contains {len(metadata)} tasks:\n\n"
+        )
+        table = (
+            "| "
+            + " | ".join(df.columns)
+            + "|\n"
+            + "|-------" * len(df.columns)
+            + "|\n"
+        )
         for _, row in df.iterrows():
             table_line = "|"
             for c in df.columns:
@@ -589,7 +669,9 @@ def generate_info_pages(all_data):
     Returns:
 
     """
-    for bmark_name, bmark_data in tqdm.tqdm(all_data.items(), desc="DOCS: FULL DATA DOCS GENERATED"):
+    for bmark_name, bmark_data in tqdm.tqdm(
+        all_data.items(), desc="DOCS: FULL DATA DOCS GENERATED"
+    ):
         info = bmark_data["info"]
         mb = bmark_data["results"]
         dir_name_short = bmark_data["dir_name_short"]
@@ -619,7 +701,9 @@ def generate_info_page(mb: MatbenchBenchmark, info: dict, dir_name_short: str):
     structure_complete = convert_bool_to_unicode_check(mb.is_structure_complete)
     composition_complete = convert_bool_to_unicode_check(mb.is_composition_complete)
     regression_complete = convert_bool_to_unicode_check(mb.is_regression_complete)
-    classification_complete = convert_bool_to_unicode_check(mb.is_classification_complete)
+    classification_complete = convert_bool_to_unicode_check(
+        mb.is_classification_complete
+    )
 
     algo_name = info["algorithm"]
     algo_desc = info["algorithm_long"]
@@ -632,20 +716,24 @@ def generate_info_page(mb: MatbenchBenchmark, info: dict, dir_name_short: str):
     desc = f"### Algorithm description: \n\n{algo_desc}\n\n#### Notes:\n{notes}\n\nRaw data download and example notebook available [on the matbench repo]({url}).\n\n"
     refs = f"### References (in bibtex format): \n\n```\n{pprint.pformat(refs)}\n```\n\n"
 
-    user_metadata = f"### User metadata:\n\n```\n{pprint.pformat(mb.user_metadata)}\n```\n\n"
+    user_metadata = (
+        f"### User metadata:\n\n```\n{pprint.pformat(mb.user_metadata)}\n```\n\n"
+    )
 
     n_tasks_available = len(mb.tasks)
     n_tasks_total = len(mb.metadata.keys())
 
     metadata_header = f"### Metadata:\n\n"
 
-    metadata_table = f"| tasks recorded | {n_tasks_available}/{n_tasks_total} |\n" \
-                     f"|----------------|-------------------------------------|\n" \
-                     f"| complete? | {is_complete} | \n" \
-                     f"| composition complete? | {composition_complete} | \n" \
-                     f"| structure complete? | {structure_complete} | \n" \
-                     f"| regression complete? | {regression_complete} | \n" \
-                     f"| classification complete? | {classification_complete} | \n\n"
+    metadata_table = (
+        f"| tasks recorded | {n_tasks_available}/{n_tasks_total} |\n"
+        f"|----------------|-------------------------------------|\n"
+        f"| complete? | {is_complete} | \n"
+        f"| composition complete? | {composition_complete} | \n"
+        f"| structure complete? | {structure_complete} | \n"
+        f"| regression complete? | {regression_complete} | \n"
+        f"| classification complete? | {classification_complete} | \n\n"
+    )
 
     metadata_header += metadata_table
 
@@ -662,8 +750,13 @@ def generate_info_page(mb: MatbenchBenchmark, info: dict, dir_name_short: str):
         # needed score order as the score order is not same between fold scores and task scores
         score_order = list(task.scores.keys())
         score_order_display = ["mape*" if s == "mape" else s for s in score_order]
-        fold_table = "| fold | " + " | ".join(score_order_display) + " |\n" + \
-                     "|------ " * (len(score_order) + 1) + "|\n"
+        fold_table = (
+            "| fold | "
+            + " | ".join(score_order_display)
+            + " |\n"
+            + "|------ " * (len(score_order) + 1)
+            + "|\n"
+        )
         for fold_key, fold_data in task.results.items():
             fold_line = f" | {fold_key} "
 
@@ -674,33 +767,55 @@ def generate_info_page(mb: MatbenchBenchmark, info: dict, dir_name_short: str):
             fold_table += fold_line
         fold_table += "\n\n"
 
-
-
         fold_dist_header = f"###### Fold score stats\n\n"
-        dist_table = "| metric | mean | max | min | std |\n" \
-                     "|--------|------|-----|-----|-----|\n"
+        dist_table = (
+            "| metric | mean | max | min | std |\n"
+            "|--------|------|-----|-----|-----|\n"
+        )
         for metric_name, stats in task.scores.items():
             # add an asterisk next to mape since the metric is edited to not skew data on very small magnitude values
-            display_name = metric_name + "*" if metric_name == "mape" else metric_name
+            display_name = (
+                metric_name + "*" if metric_name == "mape" else metric_name
+            )
             dist_table += f"| {display_name} | {format_float(stats.mean)} | {format_float(stats.max)} | {format_float(stats.min)} | {format_float(stats.std)} |\n"
 
         dist_table += "\n\n"
 
         params_header = "###### Fold parameters\n\n"
-        params_table = "| fold | params dict|\n" \
-                       "|------|------------|\n"
+        params_table = "| fold | params dict|\n" "|------|------------|\n"
         for fold_key, fold_data in task.results.items():
             params_short = f"{fold_data.parameters}"[:200]
-            params_short = params_short + "..." if len(params_short) == 200 else params_short
+            params_short = (
+                params_short + "..." if len(params_short) == 200 else params_short
+            )
             fold_line = f"| {fold_key} | `{params_short}` |\n"
             params_table += fold_line
 
         params_table += "\n\n"
 
-        task_section = task_header + fold_data_header + fold_table + fold_dist_header + dist_table + params_header + params_table + "\n\n"
+        task_section = (
+            task_header
+            + fold_data_header
+            + fold_table
+            + fold_dist_header
+            + dist_table
+            + params_header
+            + params_table
+            + "\n\n"
+        )
         data_txt += task_section
 
-    final_txt = header + desc + refs + user_metadata + metadata_header + requirements_header + requirements_body + all_tasks_header + data_txt
+    final_txt = (
+        header
+        + desc
+        + refs
+        + user_metadata
+        + metadata_header
+        + requirements_header
+        + requirements_body
+        + all_tasks_header
+        + data_txt
+    )
     return final_txt
 
 
@@ -709,7 +824,7 @@ def format_float(number):
 
 
 def format_int(number):
-    return f'{number:,}'
+    return f"{number:,}"
 
 
 def nuke_docs(check=True):
@@ -801,9 +916,11 @@ if __name__ == "__main__":
             name = info["algorithm"]
             all_data[name] = {"results": mb, "info": info, "dir_name_short": d}
 
-
-    gp_leaderboard_data_by_bmark, task_leaderboards_data_by_bmark, gp_graph_data_by_bmark = organize_task_data(all_data)
-
+    (
+        gp_leaderboard_data_by_bmark,
+        task_leaderboards_data_by_bmark,
+        gp_graph_data_by_bmark,
+    ) = organize_task_data(all_data)
 
     print("DOCS: ALL DATA ACQUIRED")
 
@@ -817,5 +934,3 @@ if __name__ == "__main__":
     generate_scaled_errors_graph(gp_graph_data_by_bmark)
 
     generate_general_purpose_leaderboard_and_plot(gp_leaderboard_data_by_bmark)
-
-
