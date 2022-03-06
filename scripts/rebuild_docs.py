@@ -134,14 +134,19 @@ def generate_scaled_errors_graph(gp_graph_data_by_bmark):
         scaled_df.index = scaled_df["Problem"]
         scaled_df = scaled_df.drop(columns=["n_samples", "Problem"])
 
-        non_fictitious_df = scaled_df[
-            scaled_df.columns.drop(list(scaled_df.filter(regex="fictitious")))
-        ]
-        best_values = non_fictitious_df.min(axis=1)
-        best_algos = non_fictitious_df.idxmin(axis=1)
+        fictitious_names = list(scaled_df.filter(regex="fictitious"))
+        fictitious_df = scaled_df[fictitious_names]
+        scaled_df = scaled_df[scaled_df.columns.drop(fictitious_names)]
+        best_values = scaled_df.min(axis=1)
+        best_algos = scaled_df.idxmin(axis=1)
 
         # get models as categories in a single column
-        plot_df = scaled_df.melt(value_vars=scaled_df.columns, var_name="algorithm", value_name="error", ignore_index=False)
+        plot_df = scaled_df.melt(
+            value_vars=scaled_df.columns,
+            var_name="algorithm",
+            value_name="error",
+            ignore_index=False,
+        )
         # convert tasks ("Problem") from an index to a column
         plot_df = plot_df.reset_index()
         fig = px.strip(
@@ -150,7 +155,7 @@ def generate_scaled_errors_graph(gp_graph_data_by_bmark):
             y="error",
             color="algorithm",
             log_y=True,
-            stripmode="overlay",
+            stripmode="overlay",  # default is "group"
         )
         fig.update_traces(
             marker={"size": 10},
@@ -173,7 +178,7 @@ def generate_scaled_errors_graph(gp_graph_data_by_bmark):
             xaxis_title="",
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font={"color": "white"},
+            font={"color": "rgb(220,220,220)"},
         )
 
         # add scatter for the best algorithms on scaled error
@@ -192,6 +197,43 @@ def generate_scaled_errors_graph(gp_graph_data_by_bmark):
                 name="Best algorithms",
             )
         )
+
+        # add scatter for the fictitious weighted ensemble average
+        fig.add_trace(
+            go.Scatter(
+                mode="markers",
+                x=fictitious_df.index,
+                y=fictitious_df["fictitious_model"],
+                marker=dict(
+                    color="white",
+                    size=10,
+                    symbol="square",
+                ),
+                hovertemplate="Algorithm: %{text}<br>Problem: %{x}<br>Scaled Error: %{y}<br>",
+                text=best_algos,
+                visible="legendonly",
+                name="fictitious_model",
+            )
+        )
+
+        # add scatter for fictitious best predictions compound-wise
+        fig.add_trace(
+            go.Scatter(
+                mode="markers",
+                x=fictitious_df.index,
+                y=fictitious_df["fictitious_compound"],
+                marker=dict(
+                    color="white",
+                    size=10,
+                    symbol="triangle-up",
+                ),
+                hovertemplate="Algorithm: %{text}<br>Problem: %{x}<br>Scaled Error: %{y}<br>",
+                text=best_algos,
+                visible="legendonly",
+                name="fictitious_compound",
+            )
+        )
+
         fig.update_xaxes(linecolor="grey", gridcolor="grey")
         fig.update_yaxes(linecolor="grey", gridcolor="grey")
         fig.write_html(SCALED_ERRORS_PATH)
