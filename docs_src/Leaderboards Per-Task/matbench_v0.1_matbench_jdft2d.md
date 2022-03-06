@@ -8,6 +8,8 @@ _Leaderboard for an individual task. Algorithms shown here may include both gene
 
 | algorithm | mean mae | std mae | mean rmse | max max_error |
 |------|------|------|------|------|
+| [fictitious_compound](../Full%20Benchmark%20Data/matbench_v0.1_fictitious_compound_wise.md) | **21.9636** | 9.8048 | 79.3013 | 1519.7424 | 
+| [fictitious_model](../Full%20Benchmark%20Data/matbench_v0.1_fictitious_model_wise.md) | **33.3825** | 9.8594 | 91.6341 | 1533.5975 | 
 | [MODNet (v0.1.10)](../Full%20Benchmark%20Data/matbench_v0.1_modnet_v0.1.10.md) | **34.5368** | 9.4959 | 92.2288 | 1534.9797 | 
 | [AMMExpress v2020](../Full%20Benchmark%20Data/matbench_v0.1_automatminer_expressv2020.md) | **39.8497** | 9.8835 | 106.5460 | 1552.9102 | 
 | [ALIGNN](../Full%20Benchmark%20Data/matbench_v0.1_alignn.md) | **43.4244** | 8.9491 | 117.4213 | 1519.7424 | 

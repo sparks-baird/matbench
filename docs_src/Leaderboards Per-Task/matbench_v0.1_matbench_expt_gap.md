@@ -8,6 +8,8 @@ _Leaderboard for an individual task. Algorithms shown here may include both gene
 
 | algorithm | mean mae | std mae | mean rmse | max max_error |
 |------|------|------|------|------|
+| [fictitious_compound](../Full%20Benchmark%20Data/matbench_v0.1_fictitious_compound_wise.md) | **0.1001** | 0.0076 | 0.3245 | 7.8869 | 
+| [fictitious_model](../Full%20Benchmark%20Data/matbench_v0.1_fictitious_model_wise.md) | **0.3218** | 0.0108 | 0.6774 | 8.8678 | 
 | [CrabNet](../Full%20Benchmark%20Data/matbench_v0.1_CrabNet.md) | **0.3463** | 0.0088 | 0.8504 | 9.8002 | 
 | [MODNet (v0.1.10)](../Full%20Benchmark%20Data/matbench_v0.1_modnet_v0.1.10.md) | **0.3470** | 0.0222 | 0.7437 | 9.8567 | 
 | [Ax+CrabNet v1.2.1](../Full%20Benchmark%20Data/matbench_v0.1_Ax_CrabNet_v1.2.1.md) | **0.3566** | 0.0248 | 0.8673 | 11.0998 | 
