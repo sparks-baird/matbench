@@ -129,3 +129,121 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+docs/404.html
+docs/assets/_mkdocstrings.css
+docs/assets/javascripts/bundle.5e13d264.min.js
+docs/assets/javascripts/bundle.5e13d264.min.js.map
+docs/assets/javascripts/lunr/min/lunr.da.min.js
+docs/assets/javascripts/lunr/min/lunr.de.min.js
+docs/assets/javascripts/lunr/min/lunr.du.min.js
+docs/assets/javascripts/lunr/min/lunr.es.min.js
+docs/assets/javascripts/lunr/min/lunr.fi.min.js
+docs/assets/javascripts/lunr/min/lunr.fr.min.js
+docs/assets/javascripts/lunr/min/lunr.hu.min.js
+docs/assets/javascripts/lunr/min/lunr.it.min.js
+docs/assets/javascripts/lunr/min/lunr.nl.min.js
+docs/assets/javascripts/lunr/min/lunr.no.min.js
+docs/assets/javascripts/lunr/min/lunr.pt.min.js
+docs/assets/javascripts/lunr/min/lunr.ro.min.js
+docs/assets/javascripts/lunr/min/lunr.ru.min.js
+docs/assets/javascripts/lunr/min/lunr.sv.min.js
+docs/assets/javascripts/lunr/min/lunr.tr.min.js
+docs/assets/javascripts/lunr/tinyseg.js
+docs/assets/javascripts/lunr/wordcut.js
+docs/assets/javascripts/workers/search.b6ff8c07.min.js
+docs/assets/javascripts/workers/search.b6ff8c07.min.js.map
+docs/assets/stylesheets/main.ee0f47ba.min.css
+docs/Benchmark Info/matbench_v0.1/index.html
+docs/Benchmark Info/notes/index.html
+docs/Full Benchmark Data/matbench_v0.1_alignn/index.html
+docs/Full Benchmark Data/matbench_v0.1_automatminer_expressv2020/index.html
+docs/Full Benchmark Data/matbench_v0.1_Ax_CrabNet_v1.2.1/index.html
+docs/Full Benchmark Data/matbench_v0.1_cgcnnv2019/index.html
+docs/Full Benchmark Data/matbench_v0.1_CrabNet/index.html
+docs/Full Benchmark Data/matbench_v0.1_CrabNet_v1.2.1/index.html
+docs/Full Benchmark Data/matbench_v0.1_dummy/index.html
+docs/Full Benchmark Data/matbench_v0.1_fictitious_compound_wise/index.html
+docs/Full Benchmark Data/matbench_v0.1_fictitious_model_wise/index.html
+docs/Full Benchmark Data/matbench_v0.1_modnet_v0.1.10/index.html
+docs/Full Benchmark Data/matbench_v0.1_rf/index.html
+docs/How To Use/1install/index.html
+docs/How To Use/2run/index.html
+docs/How To Use/3submit/index.html
+docs/How To Use/advanced/index.html
+docs/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_dielectric/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_expt_gap/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_expt_is_metal/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_glass/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_jdft2d/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_log_gvrh/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_log_kvrh/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_mp_e_form/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_mp_gap/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_mp_is_metal/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_perovskites/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_phonons/index.html
+docs/Leaderboards Per-Task/matbench_v0.1_matbench_steels/index.html
+docs/Reference/MatbenchBenchmark/index.html
+docs/Reference/MatbenchTask/index.html
+docs/search/search_index.json
+docs/sitemap.xml
+docs/sitemap.xml.gz
+docs/static/gp_table.json
+docs/static/scaled_errors.html
+docs/static/scaled_errors.json
+docs/static/task_matbench_v0.1_matbench_dielectric.html
+docs/static/task_matbench_v0.1_matbench_expt_gap.html
+docs/static/task_matbench_v0.1_matbench_expt_is_metal.html
+docs/static/task_matbench_v0.1_matbench_glass.html
+docs/static/task_matbench_v0.1_matbench_jdft2d.html
+docs/static/task_matbench_v0.1_matbench_log_gvrh.html
+docs/static/task_matbench_v0.1_matbench_log_kvrh.html
+docs/static/task_matbench_v0.1_matbench_mp_e_form.html
+docs/static/task_matbench_v0.1_matbench_mp_gap.html
+docs/static/task_matbench_v0.1_matbench_mp_is_metal.html
+docs/static/task_matbench_v0.1_matbench_perovskites.html
+docs/static/task_matbench_v0.1_matbench_phonons.html
+docs/static/task_matbench_v0.1_matbench_steels.html
+docs_src/Benchmark Info/matbench_v0.1.md
+docs_src/Full Benchmark Data/matbench_v0.1_alignn.md
+docs_src/Full Benchmark Data/matbench_v0.1_automatminer_expressv2020.md
+docs_src/Full Benchmark Data/matbench_v0.1_Ax_CrabNet_v1.2.1.md
+docs_src/Full Benchmark Data/matbench_v0.1_cgcnnv2019.md
+docs_src/Full Benchmark Data/matbench_v0.1_CrabNet.md
+docs_src/Full Benchmark Data/matbench_v0.1_CrabNet_v1.2.1.md
+docs_src/Full Benchmark Data/matbench_v0.1_dummy.md
+docs_src/Full Benchmark Data/matbench_v0.1_fictitious_compound_wise.md
+docs_src/Full Benchmark Data/matbench_v0.1_fictitious_model_wise.md
+docs_src/Full Benchmark Data/matbench_v0.1_modnet_v0.1.10.md
+docs_src/Full Benchmark Data/matbench_v0.1_rf.md
+docs_src/index.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_dielectric.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_expt_gap.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_expt_is_metal.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_glass.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_jdft2d.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_log_gvrh.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_log_kvrh.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_mp_e_form.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_mp_gap.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_mp_is_metal.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_perovskites.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_phonons.md
+docs_src/Leaderboards Per-Task/matbench_v0.1_matbench_steels.md
+docs_src/static/gp_table.json
+docs_src/static/scaled_errors.html
+docs_src/static/scaled_errors.json
+docs_src/static/task_matbench_v0.1_matbench_dielectric.html
+docs_src/static/task_matbench_v0.1_matbench_expt_gap.html
+docs_src/static/task_matbench_v0.1_matbench_expt_is_metal.html
+docs_src/static/task_matbench_v0.1_matbench_glass.html
+docs_src/static/task_matbench_v0.1_matbench_jdft2d.html
+docs_src/static/task_matbench_v0.1_matbench_log_gvrh.html
+docs_src/static/task_matbench_v0.1_matbench_log_kvrh.html
+docs_src/static/task_matbench_v0.1_matbench_mp_e_form.html
+docs_src/static/task_matbench_v0.1_matbench_mp_gap.html
+docs_src/static/task_matbench_v0.1_matbench_mp_is_metal.html
+docs_src/static/task_matbench_v0.1_matbench_perovskites.html
+docs_src/static/task_matbench_v0.1_matbench_phonons.html
+docs_src/static/task_matbench_v0.1_matbench_steels.html
