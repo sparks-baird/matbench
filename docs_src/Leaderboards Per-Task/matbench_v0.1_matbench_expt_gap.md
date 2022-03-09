@@ -14,8 +14,11 @@ _Leaderboard for an individual task. Algorithms shown here may include both gene
 | [MODNet (v0.1.10)](../Full%20Benchmark%20Data/matbench_v0.1_modnet_v0.1.10.md) | **0.3470** | 0.0222 | 0.7437 | 9.8567 | 
 | [Ax+CrabNet v1.2.1](../Full%20Benchmark%20Data/matbench_v0.1_Ax_CrabNet_v1.2.1.md) | **0.3566** | 0.0248 | 0.8673 | 11.0998 | 
 | [CrabNet v1.2.1](../Full%20Benchmark%20Data/matbench_v0.1_CrabNet_v1.2.1.md) | **0.3757** | 0.0207 | 0.8805 | 10.2572 | 
+| [RooSt](../Full%20Benchmark%20Data/matbench_v0.1_roost_300epochs.md) | **0.4105** | 0.0360 | 0.9277 | 8.2795 | 
+| [RoosterCrab](../Full%20Benchmark%20Data/matbench_v0.1_roostercrab.md) | **0.4124** | 0.0410 | 0.9457 | 10.4711 | 
 | [AMMExpress v2020](../Full%20Benchmark%20Data/matbench_v0.1_automatminer_expressv2020.md) | **0.4161** | 0.0194 | 0.9918 | 12.7533 | 
 | [RF-SCM/Magpie](../Full%20Benchmark%20Data/matbench_v0.1_rf.md) | **0.4461** | 0.0177 | 0.8243 | 9.5428 | 
+| [CrabNet v2.0.3](../Full%20Benchmark%20Data/matbench_v0.1_crabnet_v2.0.3_300epochs.md) | **0.6948** | 0.0392 | 1.4010 | 11.6917 | 
 | [Dummy](../Full%20Benchmark%20Data/matbench_v0.1_dummy.md) | **1.1435** | 0.0310 | 1.4438 | 10.7354 | 
 
 

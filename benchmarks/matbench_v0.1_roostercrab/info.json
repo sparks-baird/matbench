@@ -1,0 +1,28 @@
+{
+    "authors": "Sterling G. Baird, Hasan M. Sayeed, Taylor D. Sparks",
+    "algorithm": "RoosterCrab",
+    "algorithm_long": "Fit CrabNet and RooSt using 300 epochs, assign compounds to clusters based on chemical similarity, and choose to use CrabNet or RooSt for each compound based on whether the containing cluster sees overall better performance with CrabNet or RooSt, respectively.",
+    "bibtex_refs": [
+        "@article{Wang2021crabnet,\n author = {Wang, Anthony Yu-Tung and Kauwe, Steven K. and Murdock, Ryan J. and Sparks, Taylor D.},\n year = {2021},\n title = {Compositionally restricted attention-based network for materials property predictions},\n pages = {77},\n volume = {7},\n number = {1},\n doi = {10.1038/s41524-021-00545-1},\n publisher = {{Nature Publishing Group}},\n shortjournal = {npj Comput. Mater.},\n journal = {npj Computational Materials}\n }"
+    ],
+    "notes": "A Jupyter notebook is provided which contains additional details about the run of the algorithm.",
+    "requirements": {
+        "python": [
+            [
+                "crabnet==2.0.3",
+                "scikit_learn==1.0.2",
+                "matbench==0.5",
+                "scipy",
+                "tqdm",
+                "torch",
+                "numpy",
+                "pymatgen",
+                "torch_scatter",
+                "pandas",
+                "scikit_learn",
+                "pytest",
+                "tensorboard"
+            ]
+        ]
+    }
+}

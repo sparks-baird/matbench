@@ -1,0 +1,25 @@
+{
+    "authors": "Sterling G. Baird, Hasan M. Sayeed, Taylor D. Sparks",
+    "algorithm": "RooSt",
+    "algorithm_long": "Fit RooSt using 300 epochs and rest default parameters to serve as a baseline for RoosterCrab.",
+    "bibtex_refs": [
+        "@article{goodallPredictingMaterialsProperties2020b, title = {Predicting Materials Properties without Crystal Structure: Deep Representation Learning from Stoichiometry}, shorttitle = {Predicting Materials Properties without Crystal Structure}, author = {Goodall, Rhys E. A. and Lee, Alpha A.}, year = {2020}, month = dec, journal = {Nat Commun}, volume = {11}, number = {1}, pages = {6280}, issn = {2041-1723}, doi = {10.1038/s41467-020-19964-7}, abstract = {Machine learning has the potential to accelerate materials discovery by accurately predicting materials properties at a low computational cost. However, the model inputs remain a key stumbling block. Current methods typically use descriptors constructed from knowledge of either the full crystal structure~\textemdash ~therefore only applicable to materials with already characterised structures~\textemdash ~or structure-agnostic fixed-length representations hand-engineered from the stoichiometry. We develop a machine learning approach that takes only the stoichiometry as input and automatically learns appropriate and systematically improvable descriptors from data. Our key insight is to treat the stoichiometric formula as a dense weighted graph between elements. Compared to the state of the art for structure-agnostic methods, our approach achieves lower errors with less data.}, langid = {english}}"
+    ],
+    "notes": "A Jupyter notebook is provided which contains additional details about the run of the algorithm.",
+    "requirements": {
+        "python": [
+            [
+                "scipy",
+                "tqdm",
+                "torch",
+                "numpy",
+                "pymatgen",
+                "torch_scatter",
+                "pandas",
+                "scikit_learn",
+                "pytest",
+                "tensorboard"
+            ]
+        ]
+    }
+}
