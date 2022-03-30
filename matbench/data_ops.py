@@ -122,6 +122,47 @@ def score_array(true_array, pred_array, task_type):
         computed[metric] = mfunc(true_array, pred_array)
     return computed
 
+def uncertainty_score_array(true_array, pred_array, uncert_array, task_type):
+    """
+    Score an array according to multiple metrics.
+
+    Args:
+        true_array (list or np.array): The ground truth array
+        pred_array (list or np.array): The predicted (test) array
+        task_type (str): Either regression or classification.
+
+    Returns:
+        (dict): dictionary of the scores, according to all defined
+            metrics.
+
+    """
+    computed = {}
+
+    if task_type == REG_KEY:
+        metrics = REG_METRICS
+    elif task_type == CLF_KEY:
+        metrics = CLF_METRICS
+    else:
+        raise ValueError(
+            f"'task_type' must be on of {[REG_KEY, CLF_KEY]}, not '{task_type}'"
+        )
+
+    for metric in metrics:
+        mfunc = METRIC_MAP[metric]
+
+        if metric == "rocauc":
+            # Both arrays must be in probability form
+            # if pred. array is given in probabilities
+            if isinstance(pred_array[0], float):
+                true_array = homogenize_clf_array(true_array, to_probs=True)
+
+        # Other clf metrics always be converted to labels
+        elif metric in CLF_METRICS:
+            if isinstance(pred_array[0], float):
+                pred_array = homogenize_clf_array(pred_array, to_labels=True)
+
+        computed[metric] = mfunc(true_array, pred_array)
+    return computed
 
 def mean_absolute_percentage_error(y_true, y_pred, threshold=1e-5):
     """Compute mean absolute percentage error, masked
