@@ -32,6 +32,21 @@ COMPOSITION_KEY = "composition"
 REG_METRICS = ["mae", "rmse", "mape", "max_error"]
 CLF_METRICS = ["accuracy", "balanced_accuracy", "f1", "rocauc"]
 
+# See "metrics" https://github.com/uncertainty-toolbox/uncertainty-toolbox/
+UNC_REG_METRICS = [
+    "mace",
+    "rmsce",
+    "miscal_area",
+    "maagce",
+    "rmsagce",
+    "exp_std_dev",
+    "neg_log_lik",
+    "crps",
+    "check_score",
+    "interval_score",
+]
+UNC_CLF_METRICS: list = []
+
 # threshold for converting probabilities to labels
 CLF_THRESH = 0.5
 
