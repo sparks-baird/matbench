@@ -17,6 +17,8 @@ from matbench.constants import (
     MBV01_KEY,
     REG_KEY,
     REG_METRICS,
+    UNC_CLF_METRICS,
+    UNC_REG_METRICS,
 )
 from matbench.data_ops import load, score_array
 from matbench.metadata import mbv01_metadata, mbv01_validation
@@ -625,6 +627,37 @@ class MatbenchTask(MSONable, MSONable2File):
         """
         metric_keys = (
             REG_METRICS if self.metadata.task_type == REG_KEY else CLF_METRICS
+        )
+        scores = {}
+        self._check_all_folds_recorded("Cannot score unless all folds are recorded!")
+        for mk in metric_keys:
+            metric = {}
+
+            # scores for a metric among all folds
+            raw_metrics_on_folds = [
+                self.results[fk][self._SCORES_KEY][mk]
+                for fk in self.folds_map.values()
+            ]
+            for op in FOLD_DIST_METRICS:
+                metric[op] = getattr(np, op)(raw_metrics_on_folds)
+            scores[mk] = metric
+        return RecursiveDotDict(scores)
+    
+    @property
+    def uncertainty_scores(self):
+        """Comprehensive uncertainty score metrics for this task.
+
+        Gets means, maxes, mins, and more distribution stats (across folds)
+        for all scoring metrics defined for this task.
+
+        There will be different scores for classification problems and
+        regression problems.
+
+        Returns:
+            (dict): A dictionary of all the scores for this
+        """
+        metric_keys = (
+            UNC_REG_METRICS if self.metadata.task_type == REG_KEY else UNC_CLF_METRICS
         )
         scores = {}
         self._check_all_folds_recorded("Cannot score unless all folds are recorded!")
